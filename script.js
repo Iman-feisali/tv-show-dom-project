@@ -1,6 +1,16 @@
 //You can edit ALL of the code here
-const allEpisodes = getAllEpisodes();
+
+let allEpisodes;
 const body = document.querySelector("body");
+
+fetch("https://api.tvmaze.com/shows/82/episodes")
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (data) {
+    allEpisodes = data;
+  })
+  .catch((err) => console.log(err));
 
 //header
 const header = document.createElement("header");
@@ -18,13 +28,21 @@ let divElement = document.createElement("div");
 divElement.id = "main";
 body.appendChild(divElement);
 
+//select shows
+let selectedShows = document.createElement("select");
+const firstShowOption = document.createElement("option");
+selectedShows.prepend(firstShowOption);
+firstShowOption.innerText = "< SELECT SHOWS >";
+selectedShows.id = "select_shows";
+navBar.prepend(selectedShows);
+
 // select eposides
 let selectedEpisode = document.createElement("select");
 const firstOption = document.createElement("Option");
 selectedEpisode.prepend(firstOption);
 firstOption.innerText = "< SELECT EPISODES >";
 selectedEpisode.id = "select_episode";
-navBar.prepend(selectedEpisode);
+navBar.appendChild(selectedEpisode);
 selectedEpisode.addEventListener("change", selectEpisode);
 
 function selectEpisode() {
@@ -110,14 +128,14 @@ let footerText = document.createElement("p");
 let source = document.createElement("a");
 source.target = "_blank";
 source.textContent = "TVMAZE.COM";
-footerText.innerText = "THIS WEBSITE IS USING " + source;
+footerText.innerText = "THIS WEBSITE IS USING DATA FROM " + source;
 body.appendChild(footerContainer);
 footerContainer.appendChild(footerText);
 footerText.appendChild(source);
 source.href = "https://www.tvmaze.com/";
 
 function setup() {
-  const allEpisodes = getAllEpisodes();
+  //let allshows = getAllShows();
   makePageForEpisodes(allEpisodes);
 }
 
