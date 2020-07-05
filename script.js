@@ -1,16 +1,30 @@
 //You can edit ALL of the code here
-
+let allShows = getAllShows().sort(function (a, b) {
+  if (a.name < b.name) {
+    return -1;
+  } else if (a.name > b.name) {
+    return 1;
+  } else {
+    return 0;
+  }
+});
 let allEpisodes;
 const body = document.querySelector("body");
+let selectedShowsId = allShows.map((p) => p.id);
+let defaulShowId = "82";
 
-fetch("https://api.tvmaze.com/shows/82/episodes")
-  .then(function (response) {
-    return response.json();
-  })
-  .then(function (data) {
-    allEpisodes = data;
-  })
-  .catch((err) => console.log(err));
+function getFetchForEpisodes(showsId) {
+  fetch(`https://api.tvmaze.com/shows/${showsId}/episodes`)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      allEpisodes = data;
+      makePageForEpisodes(allEpisodes);
+      makeEpisodeList(allEpisodes);
+    })
+    .catch((err) => console.log(err));
+}
 
 //header
 const header = document.createElement("header");
@@ -30,20 +44,58 @@ body.appendChild(divElement);
 
 //select shows
 let selectedShows = document.createElement("select");
+selectedShows.id = "shows-list";
 const firstShowOption = document.createElement("option");
 selectedShows.prepend(firstShowOption);
 firstShowOption.innerText = "< SELECT SHOWS >";
 selectedShows.id = "select_shows";
 navBar.prepend(selectedShows);
+selectedShows.addEventListener("change", getShowId);
 
-// select eposides
+function makeShowsList(showsList) {
+  showsList.forEach((show) => createShowsList(show));
+}
+
+function createShowsList(newShows) {
+  let showsOption = document.createElement("option");
+  selectedShows.appendChild(showsOption);
+  showsOption.value = newShows.id;
+  showsOption.innerHTML = newShows.name;
+}
+
+function getShowId() {
+  selectedEpisode.innerHTML = "";
+  let findShowsId = allShows.find((shows) => shows.id == selectedShows.value);
+  if (findShowsId == null) {
+    getFetchForEpisodes(defaulShowId);
+  } else {
+    getFetchForEpisodes(findShowsId.id);
+  }
+}
+
+// select episodes
 let selectedEpisode = document.createElement("select");
-const firstOption = document.createElement("Option");
+let firstOption = document.createElement("Option");
 selectedEpisode.prepend(firstOption);
 firstOption.innerText = "< SELECT EPISODES >";
 selectedEpisode.id = "select_episode";
 navBar.appendChild(selectedEpisode);
 selectedEpisode.addEventListener("change", selectEpisode);
+
+function makeEpisodeList(newEpisodes) {
+  newEpisodes.forEach((episode) => createEpisodesList(episode));
+}
+
+function createEpisodesList(episode) {
+  selectedEpisode.prepend(firstOption);
+  firstOption.innerText = "< SELECT EPISODES >";
+  let episodeOptions = document.createElement("Option");
+  selectedEpisode.appendChild(episodeOptions);
+  episodeOptions.value = episode.id;
+  episodeOptions.innerHTML = `S${formatEpisodeNumber(
+    episode.season
+  )}E${formatEpisodeNumber(episode.number)}: ${episode.name}`;
+}
 
 function selectEpisode() {
   let findedEpisode = allEpisodes.find(
@@ -68,7 +120,6 @@ searchBar.addEventListener("keydown", searchEpisodes);
 let episodesToDisplay = document.createElement("span");
 navBar.appendChild(episodesToDisplay);
 
-//makePageForEpisodes(search);
 function searchEpisodes() {
   var searchedEpisodes = allEpisodes.filter((p) =>
     (p.name + p.summary).toLowerCase().includes(searchBar.value.toLowerCase())
@@ -111,14 +162,6 @@ function createCard(episode) {
   makeSummary.id = "summary";
   card.appendChild(makeSummary);
   makeSummary.innerHTML = "summary: " + episode.summary;
-
-  //select
-  let episodeOptions = document.createElement("Option");
-  selectedEpisode.appendChild(episodeOptions);
-  episodeOptions.value = episode.id;
-  episodeOptions.innerHTML = `S${formatEpisodeNumber(
-    episode.season
-  )}E${formatEpisodeNumber(episode.number)}: ${episode.name}`;
 }
 
 //footer
@@ -135,8 +178,8 @@ footerText.appendChild(source);
 source.href = "https://www.tvmaze.com/";
 
 function setup() {
-  //let allshows = getAllShows();
-  makePageForEpisodes(allEpisodes);
+  makeShowsList(allShows);
+  getFetchForEpisodes(defaulShowId);
 }
 
 window.onload = setup;

@@ -31,6 +31,7 @@ body {
 #card {
   background-color: #00909e;
   min-height: 300px;
+  max-height: 500px;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -52,7 +53,9 @@ img {
 
 #summary {
   font-family: "Roboto", sans-serif;
+  overflow-y: hidden;
 }
+
 #header {
   width: 100%;
   height: 30vh;
@@ -111,5 +114,8 @@ footer {
 @media (max-width: 940px) {
   #main {
     grid-template-columns: 1fr;
+  }
+  span {
+    font-size: smaller;
   }
 }
