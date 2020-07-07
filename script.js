@@ -155,7 +155,12 @@ function createCard(episode) {
   const makeImage = document.createElement("img");
   makeImage.id = "image";
   card.appendChild(makeImage);
-  makeImage.src = episode.image.medium;
+  if (episode.image == null) {
+    makeImage.src =
+      "https://uhcl-ir.tdl.org/bitstream/handle/10657.1/1586/not-available.jpg.jpg.jpg?sequence=3&isAllowed=y";
+  } else {
+    makeImage.src = episode.image.medium;
+  }
 
   //summary
   const makeSummary = document.createElement("div");
